@@ -1,46 +1,158 @@
+import colors from "colors/safe";
 import { chooseSimilar } from "./chooseSimilar";
 import { ILogger } from "./createLogger";
+import { TType, formatType } from "./typescriptTypes";
 
 interface IHelpNode {
   message: string[];
   children?: Record<string, IHelpNode>;
 }
 
+function g(s: string) {
+  return colors.gray(s);
+}
+
+const messagesDictType: TType = {
+  type: "dictionary",
+  key: {
+    type: "typeId",
+    id: "MessageId",
+  },
+  value: {
+    type: "typeId",
+    id: "IMessage",
+  },
+};
+
+const TContentType: TType = {
+  type: "union",
+  elements: [
+    {
+      type: "record",
+      props: {
+        type: {
+          type: "union",
+          elements: [
+            { type: "stringLiteral", literal: "text" },
+            { type: "stringLiteral", literal: "strong" },
+            { type: "stringLiteral", literal: "em" },
+          ],
+        },
+        text: "string",
+      },
+    },
+    {
+      type: "record",
+      props: {
+        type: {
+          type: "union",
+          elements: [
+            {
+              type: "stringLiteral",
+              literal: "mention",
+            },
+            {
+              type: "stringLiteral",
+              literal: "anchor",
+            },
+          ],
+        },
+        href: "string",
+        text: "string",
+      },
+    },
+    {
+      type: "record",
+      props: {
+        type: {
+          type: "stringLiteral",
+          literal: "emoji",
+        },
+        emoji: "string",
+      },
+    },
+    {
+      type: "record",
+      props: {
+        type: {
+          type: "stringLiteral",
+          literal: "hashtag",
+        },
+        hashtag: "string",
+      },
+    },
+  ],
+};
+const IMessageType: TType = {
+  type: "record",
+  props: {
+    id: "string",
+    time: {
+      type: "union",
+      elements: ["string", "null"],
+    },
+    views: "string",
+    reactions: {
+      type: "array",
+      item: {
+        type: "record",
+        props: {
+          id: "string",
+          count: "string",
+        },
+      },
+    },
+    content: {
+      type: "array",
+      item: {
+        type: "typeId",
+        id: "TContent",
+      },
+    },
+  },
+};
+
 const HELP_TREE: IHelpNode = {
   message: [
-    "Usage: bun run <command> [options]",
-    "Commands:",
-    "  help - Show instruction",
-    "  help <command> - Show help for a command",
-    "  language-stats <filePath> - Shows different stats related to language.",
-    '    Read more using "help language-stats" command.',
+    `${g("Usage: ")} bun run <command> [options]`,
+    `${g("Commands:")}`,
+    `  help ${g("- Show instruction")}`,
+    `  help <command>  ${g(`- Show help for a command`)}`,
+    `  language-stats <filePath>  ${g(
+      "- Shows different stats related to language."
+    )}`,
+    g('    Read more using "help language-stats" command.'),
   ],
   children: {
     help: {
       message: [
-        "Usage: help - shows full instruction",
-        "Example:",
-        "  help",
-        "",
-        "Usage: help <command>",
-        "Example:",
-        "  help language-stats",
+        `${g("Usage: ")}help ${g("- shows full instruction")}`,
+        g(`Example:`),
+        `  help`,
+        ``,
+        `${g("Usage: ")}help <command>`,
+        g(`Example:`),
+        `  help language-stats`,
       ],
     },
     "language-stats": {
       message: [
-        "Usage: language-stats <filePath>",
-        "Example:",
+        `${g("Usage:")} language-stats <filePath>`,
+        g(`Example:`),
         '  language-stats "data.json"',
-        'Read more "help language-stats format" to read about json file format',
+        `${g("Read more ")}"help language-stats format"${g(
+          " to read about json file format"
+        )}`,
       ],
       children: {
         format: {
           message: [
-            "In language-stats commands we are expecting such format:",
-            "  Record<MessageId, { message: string; time: string }>",
-            "Where MessageId is a string, message is a string and time is a string of format:",
-            "    25 October 2023, 12:17:40",
+            g("In language-stats commands we are expecting such format:"),
+            `  ${formatType(messagesDictType)}`,
+            g("Where MessageId is a string, IMessage is such type:"),
+            `  ${formatType(IMessageType)}`,
+            g("TContent is:"),
+            `  ${formatType(TContentType)}`,
           ],
         },
       },

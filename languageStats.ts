@@ -1,12 +1,12 @@
-export function languageStats(
-  fileContent: Record<string, { message: string; time: string }>
-): void {
-  const messages = Object.entries(fileContent).map(
-    ([id, { message, time }]) => ({
-      id,
-      message,
-      time,
-    })
-  );
-  console.log(messages);
+import { readJson } from "./lib";
+import { IMessage } from "./telegram";
+
+export async function languageStats(filePath: string): Promise<void> {
+  const fileContent = await readJson<Record<string, IMessage>>(filePath);
+
+  const messages = Object.values(fileContent);
+  let res = 0;
+  for (const m of messages) {
+    console.log(m.time);
+  }
 }
