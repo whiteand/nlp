@@ -2,6 +2,7 @@ import colors from "colors/safe";
 import { chooseSimilar } from "./chooseSimilar";
 import { ILogger } from "./createLogger";
 import { TType, formatType } from "./typescriptTypes";
+import { REACTION_TYPE_TYPE } from "./telegram/reactions";
 
 interface IHelpNode {
   message: string[];
@@ -102,6 +103,7 @@ const TelegramPostType: TType = {
       item: {
         type: "record",
         props: {
+          type: REACTION_TYPE_TYPE,
           id: "string",
           count: "number",
         },

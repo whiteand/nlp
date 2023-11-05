@@ -13,7 +13,7 @@ function assert(condition, message, result, element) {
 }
 
 /**
- * @param {import('./telegram').IMessage} result
+ * @param {import('./src/telegram/telegram').IMessage} result
  * @param {Node} child
  */
 function consumeReactionElement(result, element) {
@@ -28,7 +28,7 @@ function consumeReactionElement(result, element) {
   result.reactions.push({ id: docId, count });
 }
 /**
- * @param {import('./telegram').IMessage} result
+ * @param {import('./src/telegram/telegram').IMessage} result
  * @param {Node} child
  */
 function consumeReactionsElement(result, element) {
@@ -49,7 +49,7 @@ function consumeReactionsElement(result, element) {
 }
 
 /**
- * @param {import('./telegram').IMessage} result
+ * @param {import('./src/telegram/telegram').IMessage} result
  * @param {Node} messageChild
  */
 function consumeTimeElement(result, timeElement) {
@@ -68,13 +68,13 @@ function consumeTimeElement(result, timeElement) {
   }
 }
 /**
- * @param {import('./telegram').IMessage} result
+ * @param {import('./src/telegram/telegram').IMessage} result
  * @param {Node} messageChild
  */
 function consumeChild(result, messageChild) {
   // if child is a text node we should add { text: string } to result.content
   if (messageChild.nodeType === Node.TEXT_NODE) {
-    result.content.push({ text: messageChild.textContent });
+    result.content.push({ type: "text", text: messageChild.textContent });
     return;
   }
   if (messageChild.nodeName.toUpperCase() === "REACTIONS-ELEMENT") {
@@ -158,7 +158,7 @@ function getAllMessages() {
   const res = [];
   for (const { message, id } of bubblesWithMessages) {
     /**
-     * @type {import('./telegram').IMessage}
+     * @type {import('./src/telegram/telegram').IMessage}
      */
     const result = {
       content: [],

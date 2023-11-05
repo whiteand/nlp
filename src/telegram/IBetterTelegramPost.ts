@@ -1,5 +1,6 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { TContent } from "./telegram";
+import { ReactionType } from "./reactions";
 
 export interface IBetterTelegramPost {
   time: Temporal.ZonedDateTime;
@@ -8,5 +9,5 @@ export interface IBetterTelegramPost {
   id: string;
   views: number;
   content: TContent[];
-  reactions: { id: string; count: number }[];
+  reactions: { id: string; count: number; type: ReactionType }[];
 }

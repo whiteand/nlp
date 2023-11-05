@@ -1,7 +1,8 @@
 import assert from "node:assert";
 import { createLogger } from "./createLogger";
-import { parseTelegramMessages } from "./parseTelegramMessages";
+import { parseTelegramMessages } from "./telegram/parseTelegramMessages";
 import { printHelp } from "./printHelp";
+import { languageStats } from "./commands/language-stats";
 
 const logger = createLogger();
 
@@ -12,7 +13,7 @@ if (command === "help") {
 } else if (command === "language-stats") {
   const filePath = Bun.argv.at(3);
   assert(filePath, "Missing file path");
-  throw new Error("not implemented yet");
+  await languageStats(filePath);
 } else if (command === "improve-telegram-messages") {
   const filePath = Bun.argv.at(3);
   assert(filePath, "Missing file path");

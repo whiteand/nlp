@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { readJson } from "./lib";
+import { readJson } from "../lib";
 import { parseTelegramTime } from "./parseTelegramTime";
 import { IMessage } from "./telegram";
 import { IBetterTelegramPost } from "./IBetterTelegramPost";
@@ -31,5 +31,6 @@ export async function parseTelegramMessages(filePath: string): Promise<void> {
     return Temporal.ZonedDateTime.compare(aTime, bTime);
   });
   const newPath = filePath.replace(/\.json$/, "-v2.json");
-  Bun.write(newPath, JSON.stringify(betterMessages, null, 2));
+  await Bun.write(newPath, JSON.stringify(betterMessages, null, 2));
+  console.log("done");
 }
