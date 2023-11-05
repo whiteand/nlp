@@ -83,7 +83,40 @@ const TContentType: TType = {
     },
   ],
 };
-const IMessageType: TType = {
+const TelegramPostType: TType = {
+  type: "record",
+  props: {
+    id: "string",
+    time: "string",
+    edited: {
+      type: "union",
+      elements: ["string", "null"],
+    },
+    original: {
+      type: "union",
+      elements: ["string", "null"],
+    },
+    views: "number",
+    reactions: {
+      type: "array",
+      item: {
+        type: "record",
+        props: {
+          id: "string",
+          count: "number",
+        },
+      },
+    },
+    content: {
+      type: "array",
+      item: {
+        type: "typeId",
+        id: "TContent",
+      },
+    },
+  },
+};
+const IRawMessageType: TType = {
   type: "record",
   props: {
     id: "string",
@@ -122,6 +155,10 @@ const HELP_TREE: IHelpNode = {
       "- Shows different stats related to language."
     )}`,
     g('    Read more using "help language-stats" command.'),
+    `  improve-telegram-messages <filePath>  ${g(
+      "- parses dates and formatter numbers to single format."
+    )}`,
+    g('    Read more using "help improve-telegram-messages" command.'),
   ],
   children: {
     help: {
@@ -148,9 +185,36 @@ const HELP_TREE: IHelpNode = {
         format: {
           message: [
             g("In language-stats commands we are expecting such format:"),
+            `  ${formatType({
+              type: "array",
+              item: { type: "typeId", id: "TelegramPost" },
+            })}`,
+            g("Where BetterPostType is such type:"),
+            `  ${formatType(TelegramPostType)}`,
+            g("TContent is:"),
+            `  ${formatType(TContentType)}`,
+          ],
+        },
+      },
+    },
+    "improve-telegram-messages": {
+      message: [
+        `${g("Usage:")} improve-telegram-messages <filePath>`,
+        g(`Example:`),
+        '  improve-telegram-messages "data.json"',
+        `${g("Read more ")}"help improve-telegram-messages format"${g(
+          " to read about json file format"
+        )}`,
+      ],
+      children: {
+        format: {
+          message: [
+            g(
+              "In improve-telegram-messages commands we are expecting such format:"
+            ),
             `  ${formatType(messagesDictType)}`,
             g("Where MessageId is a string, IMessage is such type:"),
-            `  ${formatType(IMessageType)}`,
+            `  ${formatType(IRawMessageType)}`,
             g("TContent is:"),
             `  ${formatType(TContentType)}`,
           ],

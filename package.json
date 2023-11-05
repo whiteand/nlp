@@ -9,6 +9,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@js-temporal/polyfill": "^0.4.4",
     "@types/ramda": "^0.29.7",
     "colors": "^1.4.0",
     "ramda": "^0.29.1"
