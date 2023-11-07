@@ -28,7 +28,23 @@ export class CharIter
     this.index = Math.min(this.index + n, this.text.length);
   }
   slice(start: number, end: number) {
-    return this.text.slice(start + this.index, end + this.index);
+    return this.text.slice(Math.max(0, start + this.index), end + this.index);
+  }
+  startsWith(str: string) {
+    return this.text.slice(this.index).startsWith(str);
+  }
+  matchesAt(n: number, ...s: Set<number>[]): boolean {
+    const charCode = this.peekCharCodeAt(n);
+    if (charCode === null) return false;
+    for (let i = 0; i < s.length; i++) {
+      if (s[i].has(charCode)) return true;
+    }
+    return false;
+  }
+  peekCharCodeAt(n: number = 0): number | null {
+    const ind = this.index + n;
+    if (ind >= this.text.length) return null;
+    return this.text.charCodeAt(this.index + n);
   }
   next(): IteratorResult<string, any> {
     if (this.index >= this.text.length) {

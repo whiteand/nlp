@@ -1,7 +1,6 @@
 import assert from "assert";
 import { renderContentToPlainText } from "../../telegram/renderContentToPlainText";
 import { assertValidMessages } from "./assertValidMessages";
-import colors from "colors/safe";
 import { CharIter } from "../../CharIter";
 import { Lexer } from "../../Lexer";
 
@@ -14,7 +13,7 @@ export async function languageStats(filePath: string): Promise<void> {
 
   for (const m of messages) {
     const text = renderContentToPlainText(m.content);
-    console.log("Parsing:\n", colors.green(text));
+    // console.log("Parsing:\n", colors.green(text));
     const charIter = new CharIter(text);
     const lexer = new Lexer(charIter);
     while (true) {
@@ -22,7 +21,6 @@ export async function languageStats(filePath: string): Promise<void> {
       if (lexemEntry.done) {
         break;
       }
-      // console.log(lexemEntry);
     }
   }
   console.log("Done");
