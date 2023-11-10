@@ -1,49 +1,9 @@
-import { IPeakable } from "./IPeakable";
-import { ISkipable } from "./ISkipable";
+import { IPeakable } from "../IPeakable";
+import { ISkipable } from "../ISkipable";
 import colors from "colors/safe";
-import { EMOJIS } from "./EMOJIS";
-import { charCodeSetsCache } from "./charCodeSetsCache";
-
-export type Lexem = {
-  text: string;
-  type:
-    | "whitespace"
-    | "ukrainian-word"
-    | "dutch-word"
-    | "croatian-word"
-    | "slovenian-word"
-    | "italian-word"
-    | "mongolian-word"
-    | "portuguese-word"
-    | "slovak-word"
-    | "french-word"
-    | "czech-word"
-    | "latvian-word"
-    | "german-word"
-    | "spanish-word"
-    | "romanian-word"
-    | "tatarian-turkish-word"
-    | "norwegian-word"
-    | "mixed-identity-word"
-    | "mention"
-    | "angola-word"
-    | "lithuanian-word"
-    | "macedonian-word"
-    | "swidish-word"
-    | "ukrainian-numeral-word"
-    | "english-word"
-    | "icelandic-word"
-    | "polish-word"
-    | "english-numeral-word"
-    | "hebrew-word"
-    | "hashtag"
-    | "number"
-    | "number+"
-    | "url"
-    | "emoji"
-    | "special-character"
-    | "cyrillic-word"; // non ukrainian
-};
+import { EMOJIS } from "../EMOJIS";
+import { charCodeSetsCache } from "../charCodeSetsCache";
+import { Lexem } from "./Lexem";
 
 const ITALIAN_LETTERS = charCodeSetsCache.for(
   "àèéìíîòóùúAaNnBbOoCcPpDdQqEeRrFfSsGgTtHhUuIiVvJjWwKkXxLlYyMmZz"
@@ -501,7 +461,11 @@ export class Lexer implements Iterator<Lexem>, Iterable<Lexem> {
           this.charIter.skip(1);
           continue;
         }
-        if (DIGITS.has(charCode) || ENGLISH_LETTERS.has(charCode)) {
+        if (
+          DIGITS.has(charCode) ||
+          ENGLISH_LETTERS.has(charCode) ||
+          char === "_"
+        ) {
           res += char;
           this.charIter.skip(1);
           continue;
@@ -1013,7 +977,7 @@ export class Lexer implements Iterator<Lexem>, Iterable<Lexem> {
         continue;
       }
       if (WHITESPACES.has(charCode)) break;
-      if (",)!.:»…?;".includes(char)) break;
+      if (",)!.:»…?;/".includes(char)) break;
       if (CYRILLIC_LETTERS.has(charCode)) {
         this.charIter.restore(start);
         return this.nextAlphabetLexem(CYRILLIC_LETTERS, "cyrillic-word");

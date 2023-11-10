@@ -1,7 +1,7 @@
 import assert from "assert";
-import { IBetterTelegramPost } from "../../telegram/IBetterTelegramPost";
-import { REACTION_TYPES } from "../../telegram/reactions";
-import { isValidContentItem } from "../../telegram/isValidContentItem";
+import { IBetterTelegramPost } from "./IBetterTelegramPost";
+import { REACTION_TYPES } from "./reactions";
+import { isValidContentItem } from "./isValidContentItem";
 import { Temporal } from "@js-temporal/polyfill";
 
 function isTemporalString(value: any): value is string {

@@ -1,5 +1,5 @@
-import { expect, test } from "bun:test";
-import { CharIter } from "./CharIter";
+import { test } from "bun:test";
+import { CharIter } from "../CharIter";
 import { Lexer } from "./Lexer";
 
 test("opportunità to be correctly lexed", () => {

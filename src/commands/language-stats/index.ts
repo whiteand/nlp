@@ -1,27 +1,24 @@
-import assert from "assert";
-import { renderContentToPlainText } from "../../telegram/renderContentToPlainText";
-import { assertValidMessages } from "./assertValidMessages";
-import { CharIter } from "../../CharIter";
-import { Lexer } from "../../Lexer";
+import { Lexem, LexemsList } from "../../lexer/Lexem";
+import { getLexemsFromContent } from "./getLexemsFromContent";
+import { readBetterMessagesFromFile } from "../../telegram/readBetterMessagesFromFile";
 
 export async function languageStats(filePath: string): Promise<void> {
-  const file = Bun.file(filePath, { type: "application/json" });
-  assert(await file.exists(), "file is not exists");
+  const messages = await readBetterMessagesFromFile(filePath);
 
-  const messages = await file.json();
-  assertValidMessages(messages);
+  const lexems = LexemsList.empty();
 
   for (const m of messages) {
-    const text = renderContentToPlainText(m.content);
-    // console.log("Parsing:\n", colors.green(text));
-    const charIter = new CharIter(text);
-    const lexer = new Lexer(charIter);
-    while (true) {
-      const lexemEntry = lexer.next();
-      if (lexemEntry.done) {
-        break;
-      }
+    for (const lexem of getLexemsFromContent(m.content)) {
+      lexems.push(lexem);
     }
   }
+
+  console.log(
+    lexems
+      // .selectByType("ukrainian-word")
+      // .filter((entry) => entry.item.text.length > 4 && entry.count > 1)
+      .sliceTop(0, 25)
+      .toString()
+  );
   console.log("Done");
 }
