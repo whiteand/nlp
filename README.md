@@ -13,3 +13,10 @@ bun run index.ts
 ```
 
 This project was created using `bun init` in bun v1.0.6. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+
+
+# Usage Examples:
+
+```bash
+bun run ./src/index.ts telegram-print ./data/zelensky.json | bun run './src/index.ts' language-stats
+```

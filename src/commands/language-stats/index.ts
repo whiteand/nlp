@@ -1,24 +1,49 @@
 import { Lexem, LexemsList } from "../../lexer/Lexem";
 import { getLexemsFromContent } from "./getLexemsFromContent";
 import { readBetterMessagesFromFile } from "../../telegram/readBetterMessagesFromFile";
+import { ConsoleBarChart } from "../../ConsoleBarChart";
+import { Lexer } from "../../lexer/Lexer";
+import { CharIter } from "../../CharIter";
 
-export async function languageStats(filePath: string): Promise<void> {
-  const messages = await readBetterMessagesFromFile(filePath);
+export async function languageStats(): Promise<void> {
+  const chunks: Buffer[] = [];
+  process.stdin
+    .on("data", (data) => {
+      chunks.push(data);
+    })
+    .on("end", () => {
+      const content = Buffer.concat(chunks).toString("utf-8");
+      const lexems = LexemsList.empty();
+      const lexer = new Lexer(new CharIter(content));
+      while (true) {
+        const entry = lexer.next();
+        if (entry.done) break;
+        lexems.push(entry.value);
+      }
 
-  const lexems = LexemsList.empty();
+      const barChart = new ConsoleBarChart<{
+        count: number;
+        type: Lexem["type"];
+      }>({
+        rows: [],
+        valueProp: "count",
+      });
 
-  for (const m of messages) {
-    for (const lexem of getLexemsFromContent(m.content)) {
-      lexems.push(lexem);
-    }
-  }
+      for (const lexemType of lexems.types()) {
+        barChart.push({
+          count: lexems.selectByType(lexemType).length,
+          type: lexemType,
+        });
+      }
 
-  console.log(
-    lexems
-      // .selectByType("ukrainian-word")
-      // .filter((entry) => entry.item.text.length > 4 && entry.count > 1)
-      .sliceTop(0, 25)
-      .toString()
-  );
-  console.log("Done");
+      console.log(
+        barChart.toString({
+          labelProp: "type",
+          collapseSmall: {
+            label: "Others",
+            minRatio: 0.1,
+          },
+        })
+      );
+    });
 }

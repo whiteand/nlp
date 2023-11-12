@@ -153,10 +153,11 @@ const HELP_TREE: IHelpNode = {
     `${g("Commands:")}`,
     `  help ${g("- Show instruction")}`,
     `  help <command>  ${g(`- Show help for a command`)}`,
-    `  language-stats <filePath>  ${g(
-      "- Shows different stats related to language."
-    )}`,
+    `  language-stats  ${g("- Shows different stats related to language.")}`,
     g('    Read more using "help language-stats" command.'),
+    `  telegram-print <filePath>  ${g(
+      "- prints all telegram message text finto the standard output."
+    )}`,
     `  improve-telegram-messages <filePath>  ${g(
       "- parses dates and formatter numbers to single format."
     )}`,
@@ -174,19 +175,19 @@ const HELP_TREE: IHelpNode = {
         `  help language-stats`,
       ],
     },
-    "language-stats": {
+    "telegram-print": {
       message: [
-        `${g("Usage:")} language-stats <filePath>`,
+        `${g("Usage:")} telegram-print <filePath>`,
         g(`Example:`),
-        '  language-stats "data.json"',
-        `${g("Read more ")}"help language-stats format"${g(
+        '  telegram-print "data.json"',
+        `${g("Read more ")}"help telegram-print format"${g(
           " to read about json file format"
         )}`,
       ],
       children: {
         format: {
           message: [
-            g("In language-stats commands we are expecting such format:"),
+            g("In telegram-print commands we are expecting such format:"),
             `  ${formatType({
               type: "array",
               item: { type: "typeId", id: "TelegramPost" },
@@ -198,6 +199,13 @@ const HELP_TREE: IHelpNode = {
           ],
         },
       },
+    },
+    "language-stats": {
+      message: [
+        `${g("Usage:")} language-stats`,
+        g(`Example:`),
+        '  echo "Hello" | language-stats',
+      ],
     },
     "improve-telegram-messages": {
       message: [

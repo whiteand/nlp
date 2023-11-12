@@ -51,14 +51,17 @@ interface IEntry<T> {
 }
 
 export class LexemsList implements Iterable<Lexem> {
-  private length: number = 0;
+  #length: number = 0;
   private countPerTextPerType: Map<Lexem["type"], Map<string, number>>;
   constructor(countPerTextPerType: Map<Lexem["type"], Map<string, number>>) {
     this.countPerTextPerType = countPerTextPerType;
-    this.length = [...countPerTextPerType.values()].reduce(
+    this.#length = [...countPerTextPerType.values()].reduce(
       (sum, texts) => sum + texts.size,
       0
     );
+  }
+  get length(): number {
+    return this.#length;
   }
   static empty() {
     return new LexemsList(new Map());
@@ -190,7 +193,7 @@ export class LexemsList implements Iterable<Lexem> {
     return LexemsList.fromSortedEntries(this.getEntriesAsc().slice(start, end));
   }
   push(lexem: Lexem): this {
-    this.length += 1;
+    this.#length += 1;
 
     const cntByText = this.countPerTextPerType.get(lexem.type);
     if (!cntByText) {

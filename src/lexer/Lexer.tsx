@@ -518,6 +518,9 @@ export class Lexer implements Iterator<Lexem>, Iterable<Lexem> {
           this.charIter.skip(char.length);
           continue;
         }
+        if (char === "\n") {
+          break;
+        }
         this.fail("Unexpected letter in url query value: '" + char + "'");
       }
       this.fail("Unexpected state: " + state);
@@ -719,7 +722,7 @@ export class Lexer implements Iterator<Lexem>, Iterable<Lexem> {
         this.charIter.skip(char.length);
         continue;
       }
-      if (' »%:/?"–!)'.includes(char)) {
+      if (' \n»%:/?"–!)'.includes(char)) {
         break;
       }
       if (char === "-") {
