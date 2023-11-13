@@ -13,20 +13,3 @@ await new App({
   .registerCommand(TELEGRAM_PRINT_COMMAND)
   .registerCommand(IMPROVE_TELEGRAM_MESSAGE_COMMAND)
   .run(Bun.argv);
-
-// if (command === "help") {
-//   printHelp(logger, Bun.argv.slice(3));
-// } else if (command === "language-stats") {
-//   await languageStats();
-// } else if (command === "improve-telegram-messages") {
-//   const filePath = Bun.argv.at(3);
-//   assert(filePath, "Missing file path");
-//   await parseTelegramMessages(filePath);
-// } else if (command === "telegram-print") {
-//   const filePath = Bun.argv.at(3);
-//   assert(filePath, "Missing file path");
-//   await telegramPrint(filePath);
-// } else {
-//   printHelp(logger, []);
-//   process.exit(1);
-// }
