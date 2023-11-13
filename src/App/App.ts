@@ -1,6 +1,7 @@
 import { TextBuilder } from "../TextBuilder";
 import { chooseSimilar } from "../chooseSimilar";
 import { ILogger } from "../createLogger";
+import { formatCommand } from "../formatCommand";
 import { getAllPaths } from "./getAllPaths";
 import { ICommand, IHelpNode } from "./types";
 
@@ -46,7 +47,17 @@ export class App {
         return;
       }
     }
-    this.printHelp([]);
+    this.print((b) => {
+      b.gray("Unknown command:")
+        .newline(2)
+        .writeColored("red", formatCommand(...argv.slice(2)))
+        .newline(0)
+        .gray("Write")
+        .space()
+        .write(`"${formatCommand("help")}"`)
+        .space()
+        .gray("to get help");
+    });
     process.exit(1);
   }
   print(cb: (textBuilder: TextBuilder) => void) {
@@ -72,8 +83,9 @@ export class App {
       this.print((b) =>
         b
           .write("Unknown command: ")
-          .write(helpPath.join(" "))
-          .newline()
+          .newline(2)
+          .writeColored("red", helpPath.join(" "))
+          .newline(0)
           .write("Did you mean:  ")
           .newline(2)
           .write('"help ')
@@ -93,7 +105,7 @@ export class App {
     })
       .gray("Usage: ")
       .newline(2)
-      .write("bun run <command> [options]")
+      .write("bun run ./src/index.ts <command> [options]")
       .newline(0)
       .gray("Commands:")
       .newline(2)

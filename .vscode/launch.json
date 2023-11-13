@@ -15,8 +15,6 @@
                 // "telegram-print",
                 // "${workspaceFolder}/data/zelensky.json",
                 "help",
-                "telegram-print",
-                "format",
             ],
             "stopOnEntry": false,
             "watchMode": false

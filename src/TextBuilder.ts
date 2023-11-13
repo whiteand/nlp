@@ -9,6 +9,18 @@ interface ISpan {
   toLineOffset: number;
 }
 
+function isInSpan(span: ISpan, rowIndex: number, offset: number): boolean {
+  if (span.fromLineIndex > rowIndex) return false;
+  if (span.toLineIndex < rowIndex) return false;
+  if (span.fromLineIndex === rowIndex && span.fromLineOffset > offset) {
+    return false;
+  }
+  if (span.toLineIndex === rowIndex && span.toLineOffset <= offset) {
+    return false;
+  }
+  return true;
+}
+
 function toColored(color: TColor | null, text: string): string {
   if (color == null) return text;
   return colors[color](text);
@@ -110,6 +122,7 @@ export class TextBuilder {
   private baseTabLevel: number;
   private width: number;
   private tabSymbol = " ";
+  private tabStacks: number[] = [];
   constructor({
     baseTabLevel,
     width,
@@ -133,11 +146,30 @@ export class TextBuilder {
   private current(): string {
     return this.res[this.res.length - 1] || "";
   }
+
+  pushCurrentAsTab(delta: number = 0): this {
+    return this.pushTab(Math.max(0, this.current().length + delta));
+  }
+
+  pushTab(newTabLevel: number): this {
+    const previousTabLevel = this.tabLevel;
+    this.tabStacks.push(previousTabLevel);
+    this.tabLevel = newTabLevel;
+    return this;
+  }
+  popTab(): this {
+    this.tabLevel = this.tabStacks.pop()!;
+    if (this.tabLevel == null) {
+      throw new Error("Cannot use popTab without using of pushTab before");
+    }
+    return this;
+  }
   /**
    * You should ensure that you are not violating
    * the maximum width per line
    */
   private unsafeAppend(s: string): this {
+    if (!s) return this;
     if (s === "\n") {
       this.res.push("");
       return this;
@@ -153,11 +185,13 @@ export class TextBuilder {
   write(s: string): this {
     if (!s) return this;
     if (s.indexOf("\n") >= 0) {
+      this.pushCurrentAsTab();
       const parts = s.split("\n");
       this.write(parts[0]);
       for (let i = 1; i < parts.length; i++) {
         this.newline().write(parts[i]);
       }
+      this.popTab();
       return this;
     }
     if (this.current().length + s.length <= this.width) {
@@ -165,14 +199,9 @@ export class TextBuilder {
       return this;
     }
 
-    const startLeft =
-      this.current().length - this.baseTabLevel * this.tabSymbol.length;
-    const startTabLevel = this.tabLevel;
-    this.tabLevel = startLeft;
     const words = s.split(" ");
     for (let i = 0; i < words.length; i++) {
       const word = words[i];
-      if (!word) continue;
       const prevSpaceWidth = i > 0 ? 1 : 0;
       if (this.current().length + prevSpaceWidth + word.length <= this.width) {
         if (prevSpaceWidth > 0) {
@@ -184,7 +213,6 @@ export class TextBuilder {
       this.newline();
       this.unsafeAppend(word);
     }
-    this.tabLevel = startTabLevel;
     return this;
   }
   private coords(): { line: number; offset: number } {
@@ -251,16 +279,7 @@ export class TextBuilder {
       const chars = line.split("");
       const charColors = chars.map((_, offset, arr) => {
         for (const { span, color } of this.colored) {
-          if (span.fromLineIndex > i) continue;
-          if (span.toLineIndex < i) continue;
-          const thisLineEndOffset =
-            span.toLineIndex === i ? span.toLineOffset : arr.length;
-          if (thisLineEndOffset <= offset) {
-            continue;
-          }
-          if (span.fromLineOffset > offset) {
-            continue;
-          }
+          if (!isInSpan(span, i, offset)) continue;
           return color;
         }
         return null;

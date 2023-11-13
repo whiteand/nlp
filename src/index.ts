@@ -1,6 +1,7 @@
 import { App } from "./App/App";
-import { LANGUAGE_STATS_COMMAND } from "./commands/language-stats";
-import { TELEGRAM_PRINT_COMMAND } from "./commands/telegram-print";
+import { IMPROVE_TELEGRAM_MESSAGE_COMMAND } from "./commands/improve-telegram-messages";
+import { LANGUAGE_STATS_COMMAND } from "./commands/language-stats/LanguageStats";
+import { TELEGRAM_PRINT_COMMAND } from "./commands/telegram-print/TelegramPrint";
 import { createLogger } from "./createLogger";
 
 const logger = createLogger();
@@ -10,6 +11,7 @@ await new App({
 })
   .registerCommand(LANGUAGE_STATS_COMMAND)
   .registerCommand(TELEGRAM_PRINT_COMMAND)
+  .registerCommand(IMPROVE_TELEGRAM_MESSAGE_COMMAND)
   .run(Bun.argv);
 
 // if (command === "help") {
