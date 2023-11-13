@@ -243,6 +243,16 @@ export class Lexer implements Iterator<Lexem>, Iterable<Lexem> {
   [Symbol.iterator](): Iterator<Lexem, any, undefined> {
     return this;
   }
+  collect<T extends { push(e: Lexem): void }>(something: T): T {
+    while (true) {
+      const entry = this.next();
+      if (entry.done) {
+        break;
+      }
+      something.push(entry.value);
+    }
+    return something;
+  }
   next(): IteratorResult<Lexem, any> {
     const charCode = this.charIter.peekCharCodeAt();
     if (!charCode) {
