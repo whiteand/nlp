@@ -12,7 +12,7 @@ export type TType =
   | "null"
   | "number";
 
-function formatTypeSmart(t: TType, formatter: IFormatter): void {
+export function formatTypeSmart(t: TType, formatter: IFormatter): void {
   if (t === "number" || t === "string" || t === "null") {
     formatter.identifier(t);
     return;
@@ -29,13 +29,18 @@ function formatTypeSmart(t: TType, formatter: IFormatter): void {
   }
   if (t.type === "record") {
     formatter.startCurly();
+    formatter.startFieldList();
     for (const prop of Object.keys(t.props)) {
       formatter
+        .startField()
         .recordFieldName(prop)
-        .punctuation(": ")
+        .punctuation(":")
+        .startFieldType()
         .format(formatTypeSmart, t.props[prop])
-        .punctuation("; ");
+        .punctuation(";")
+        .endField();
     }
+    formatter.endFieldList();
     formatter.endCurly();
     return;
   }
@@ -95,4 +100,7 @@ function formatTypeSmart(t: TType, formatter: IFormatter): void {
 
 export function formatType(t: TType) {
   return createColoredFormatter().format(formatTypeSmart, t).toString();
+}
+function endField() {
+  throw new Error("Function not implemented.");
 }

@@ -1,5 +1,7 @@
+import { ICommand } from "../../App/types";
 import { CharIter } from "../../CharIter";
 import { ConsoleBarChart } from "../../ConsoleBarChart";
+import { TextBuilder } from "../../TextBuilder";
 import { Lexem, LexemsList } from "../../lexer/Lexem";
 import { Lexer } from "../../lexer/Lexer";
 import { streamToString } from "../../streamToString";
@@ -64,14 +66,43 @@ function printLexemByLengthStats(lexems: LexemsList) {
   );
 }
 
-export async function languageStats(): Promise<void> {
-  const content = await streamToString(process.stdin);
+export async function languageStats(): Promise<void> {}
 
-  const lexems = new Lexer(new CharIter(content)).collect(LexemsList.empty());
+export const LANGUAGE_STATS_COMMAND: ICommand = {
+  name: "language-stats",
+  help() {
+    return {
+      message: new TextBuilder({ width: 80 })
+        .gray("Usage: ")
+        .write("language-stats")
+        .newline()
+        .gray("Example:")
+        .newline(1)
+        .write('echo "Hello" | language-stats')
+        .newline()
+        .build(),
+    };
+  },
+  async run() {
+    const content = await streamToString(process.stdin);
 
-  printLexemTypes(lexems);
+    const lexems = new Lexer(new CharIter(content)).collect(LexemsList.empty());
 
-  console.log();
+    printLexemTypes(lexems);
 
-  printLexemByLengthStats(lexems);
-}
+    console.log();
+
+    printLexemByLengthStats(lexems);
+  },
+  shortHelpInGlobalHelp(textBuilder) {
+    textBuilder
+      .write("language-stats")
+      .space()
+      .gray("-")
+      .space()
+      .gray(
+        "shows different stats related to language of the text passed in stdin."
+      )
+      .newline();
+  },
+};

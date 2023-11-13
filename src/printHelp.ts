@@ -9,7 +9,7 @@ interface IHelpNode {
   children?: Record<string, IHelpNode>;
 }
 
-function g(s: string) {
+function g(s: string): string {
   return colors.gray(s);
 }
 
@@ -25,99 +25,6 @@ const messagesDictType: TType = {
   },
 };
 
-const TContentType: TType = {
-  type: "union",
-  elements: [
-    {
-      type: "record",
-      props: {
-        type: {
-          type: "union",
-          elements: [
-            { type: "stringLiteral", literal: "text" },
-            { type: "stringLiteral", literal: "strong" },
-            { type: "stringLiteral", literal: "em" },
-          ],
-        },
-        text: "string",
-      },
-    },
-    {
-      type: "record",
-      props: {
-        type: {
-          type: "union",
-          elements: [
-            {
-              type: "stringLiteral",
-              literal: "mention",
-            },
-            {
-              type: "stringLiteral",
-              literal: "anchor",
-            },
-          ],
-        },
-        href: "string",
-        text: "string",
-      },
-    },
-    {
-      type: "record",
-      props: {
-        type: {
-          type: "stringLiteral",
-          literal: "emoji",
-        },
-        emoji: "string",
-      },
-    },
-    {
-      type: "record",
-      props: {
-        type: {
-          type: "stringLiteral",
-          literal: "hashtag",
-        },
-        hashtag: "string",
-      },
-    },
-  ],
-};
-const TelegramPostType: TType = {
-  type: "record",
-  props: {
-    id: "string",
-    time: "string",
-    edited: {
-      type: "union",
-      elements: ["string", "null"],
-    },
-    original: {
-      type: "union",
-      elements: ["string", "null"],
-    },
-    views: "number",
-    reactions: {
-      type: "array",
-      item: {
-        type: "record",
-        props: {
-          type: REACTION_TYPE_TYPE,
-          id: "string",
-          count: "number",
-        },
-      },
-    },
-    content: {
-      type: "array",
-      item: {
-        type: "typeId",
-        id: "TContent",
-      },
-    },
-  },
-};
 const IRawMessageType: TType = {
   type: "record",
   props: {

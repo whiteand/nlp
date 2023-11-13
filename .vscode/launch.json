@@ -12,8 +12,11 @@
             "program": "src/index.ts",
             "cwd": "${workspaceFolder}",
             "args": [
-                "language-stats",
-                "${workspaceFolder}/data/zelensky.json",
+                // "telegram-print",
+                // "${workspaceFolder}/data/zelensky.json",
+                "help",
+                "telegram-print",
+                "format",
             ],
             "stopOnEntry": false,
             "watchMode": false

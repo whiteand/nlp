@@ -8,6 +8,12 @@ export function createColoredFormatter(): IFormatter {
       res += colors.green(s);
       return this;
     },
+    startFieldList() {
+      return this;
+    },
+    finishFieldList() {
+      return this;
+    },
     recordFieldName(f) {
       res += colors.cyan(f);
       return this;
@@ -50,6 +56,12 @@ export function createColoredFormatter(): IFormatter {
     },
     toString() {
       return res;
+    },
+    startField() {
+      return this;
+    },
+    endField() {
+      return this;
     },
   };
   return formatter;
