@@ -18,6 +18,77 @@ const DEFAULT_THEME: Omit<ITheme<any, any>, "labelProp"> = {
   },
 };
 
+function getSmallerPairIndexes<T extends { value: number }>(
+  rows: T[]
+): [number, number] {
+  let smallest = 0;
+  let smaller = 1;
+  if (rows[0].value > rows[1].value) {
+    smallest = 1;
+    smaller = 0;
+  }
+  let smallestValue = rows[smallest].value;
+  let smallerValue = rows[smaller].value;
+  for (let i = 2, n = rows.length; i < n; i++) {
+    const value = rows[i].value;
+    if (value < smallestValue) {
+      smaller = smallest;
+      smallerValue = smallestValue;
+      smallest = i;
+      smallestValue = value;
+      continue;
+    }
+    if (value < smallerValue) {
+      smaller = i;
+      smallerValue = value;
+      continue;
+    }
+  }
+  return [smallest, smaller];
+}
+
+function collapseSmallest(
+  rows: { value: number; label: string }[],
+  totalValue: number,
+  collapseSmall: { label: string; minRatio: number }
+): { value: number; label: string }[] {
+  const removed = new Set<number>();
+  const collected = { label: collapseSmall.label, value: 0 };
+  const minTotal = totalValue * collapseSmall.minRatio;
+  while (true) {
+    if (removed.size === rows.length - 1) break;
+
+    let minIndex = 0;
+    while (removed.has(minIndex) && minIndex < rows.length) {
+      minIndex++;
+    }
+
+    if (minIndex >= rows.length) break;
+
+    for (let i = minIndex + 1, n = rows.length; i < n; i++) {
+      if (removed.has(i)) continue;
+      if (rows[i].value >= rows[minIndex].value) continue;
+      minIndex = i;
+    }
+
+    const minValue = rows[minIndex].value;
+
+    if (collected.value + minValue > minTotal) break;
+
+    collected.value += minValue;
+    removed.add(minIndex);
+  }
+  const res: { label: string; value: number }[] = [];
+  for (let i = 0, n = rows.length; i < n; i++) {
+    if (removed.has(i)) continue;
+    res.push(rows[i]);
+  }
+  if (removed.size > 0) {
+    res.push(collected);
+  }
+  return res;
+}
+
 interface ISizes {
   labelWidth: number;
   valueWidth: number;
@@ -61,13 +132,13 @@ export class ConsoleBarChart<T extends object> {
   }
   push(...rows: T[]): this {
     this.rows.push(...rows);
-    return this.sortDescending();
+    return this;
   }
   getValue(value: T): number {
     return (value as any)[this.valueProp] || 0;
   }
-  private sortDescending(): this {
-    this.rows.sort((a, b) => this.getValue(b) - this.getValue(a));
+  sort(cmp: (first: T, second: T) => number): this {
+    this.rows.sort(cmp);
     return this;
   }
   private groupRows<K extends keyof T>({
@@ -100,35 +171,14 @@ export class ConsoleBarChart<T extends object> {
       totalValue += rowValue;
       valueByLabel.set(label, newValue);
     }
-    const rows: { label: string; value: number }[] = labels.map((label) => ({
+    let rows: { label: string; value: number }[] = labels.map((label) => ({
       label,
       value: valueByLabel.get(label) ?? 0,
     }));
-    rows.sort((a, b) => b.value - a.value);
-    if (collapseSmall) {
-      while (true) {
-        const smallest = rows.pop();
-        if (!smallest) {
-          break;
-        }
-        const smallest2 = rows.pop();
-        if (!smallest2) {
-          rows.push(smallest);
-          break;
-        }
-        if (
-          (smallest.value + smallest2.value) / totalValue >
-          collapseSmall.minRatio
-        ) {
-          rows.push(smallest2, smallest);
-          break;
-        }
-        rows.push({
-          label: collapseSmall.label,
-          value: smallest.value + smallest2.value,
-        });
-      }
-    }
+
+    rows = collapseSmall
+      ? collapseSmallest(rows, totalValue, collapseSmall)
+      : rows;
     return { rows: rows, maxValue, minValue };
   }
 

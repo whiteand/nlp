@@ -21,7 +21,7 @@ export async function languageStats(): Promise<void> {
         lexems.push(entry.value);
       }
 
-      const barChart = new ConsoleBarChart<{
+      const lexemTypeBarChart = new ConsoleBarChart<{
         count: number;
         type: Lexem["type"];
       }>({
@@ -30,19 +30,49 @@ export async function languageStats(): Promise<void> {
       });
 
       for (const lexemType of lexems.types()) {
-        barChart.push({
+        lexemTypeBarChart.push({
           count: lexems.selectByType(lexemType).length,
           type: lexemType,
         });
       }
 
+      lexemTypeBarChart.sort((a, b) => b.count - a.count);
+
+      console.log("  Lexem types");
       console.log(
-        barChart.toString({
+        lexemTypeBarChart.toString({
           labelProp: "type",
           collapseSmall: {
             label: "Others",
-            minRatio: 0.1,
+            minRatio: 0.01,
           },
+        })
+      );
+      const wordLengthBarChart = new ConsoleBarChart<{
+        count: number;
+        length: number;
+      }>({
+        rows: [],
+        valueProp: "count",
+      });
+      const numberByLength = new Map<number, number>();
+      for (const lexemEntry of lexems.getEntriesDesc()) {
+        const lexemLength = lexemEntry.item.text.length;
+        const cnt = numberByLength.get(lexemLength) ?? 0;
+        numberByLength.set(lexemLength, cnt + 1);
+      }
+      for (const [length, count] of numberByLength.entries()) {
+        wordLengthBarChart.push({
+          count,
+          length,
+        });
+      }
+      console.log();
+      console.log("  Word Length");
+      wordLengthBarChart.sort((a, b) => a.length - b.length);
+      console.log(
+        wordLengthBarChart.toString({
+          labelProp: "length",
         })
       );
     });

@@ -143,7 +143,7 @@ export class LexemsList implements Iterable<Lexem> {
     entries.sort((a, b) => b.count - a.count);
     return entries;
   }
-  private getEntriesDesc(): IEntry<Lexem>[] {
+  getEntriesDesc(): IEntry<Lexem>[] {
     const entries = [...this.getEntries()];
     entries.sort((a, b) => b.count - a.count);
     return entries;
