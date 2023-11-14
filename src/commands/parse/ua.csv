@@ -1,0 +1,16 @@
+text,base,type,case,number,gender,tense,voice,person
+Політика,політика,noun,nominative,singular,feminine,,,
+політикою,політика,noun,instrumental,singular,feminine,,,
+а,а,conjunction,,,,,,
+спорт,спорт,noun,nominative,singular,masculine,,,
+ніхто,ніхто,pronoun,nominative,singular,masculine,,,
+не,не,particle,,,,,,
+відміняв,відміняти,verb,,singular,masculine,past,active,third
+Добрий,добрий,adjective,nominative,singular,masculine,,,
+ранок,ранок,noun,nominative,singular,masculine,,,
+Україна,Україна,noun,nominative,singular,feminine,,,
+Франківщина,Франківщина,noun,nominative,singular,feminine,,,
+Четверо,четверо,numeral,nominative,plural,masculine,,,
+українських,український,adjective,genitive,plural,masculine,,,
+військових,військовий,adjective,genitive,plural,masculine,,,
+загинули,загинути,verb,,plural,masculine,pluperfect,active,third

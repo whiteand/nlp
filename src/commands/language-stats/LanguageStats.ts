@@ -2,7 +2,8 @@ import { ICommand } from "../../App/types";
 import { CharIter } from "../../CharIter";
 import { ConsoleBarChart } from "../../ConsoleBarChart";
 import { TextBuilder } from "../../TextBuilder";
-import { Lexem, LexemsList } from "../../lexer/Lexem";
+import { LexemsList } from "../../lexer/LexemsList";
+import { Lexem } from "../../lexer/Lexem";
 import { Lexer } from "../../lexer/Lexer";
 import { streamToString } from "../../streamToString";
 

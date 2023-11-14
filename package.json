@@ -12,6 +12,7 @@
     "@js-temporal/polyfill": "^0.4.4",
     "@types/ramda": "^0.29.7",
     "colors": "^1.4.0",
+    "csv": "^6.3.5",
     "ramda": "^0.29.1"
   }
 }

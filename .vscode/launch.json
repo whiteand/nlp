@@ -12,9 +12,8 @@
             "program": "src/index.ts",
             "cwd": "${workspaceFolder}",
             "args": [
-                // "telegram-print",
-                // "${workspaceFolder}/data/zelensky.json",
-                "help",
+                "telegram-print",
+                "${workspaceFolder}/data/zelensky.json",
             ],
             "stopOnEntry": false,
             "watchMode": false
