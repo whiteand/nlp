@@ -1,6 +1,11 @@
 import assert from "assert";
 import { csvify } from "./csvify";
-import { FullLexem, TUkrainianCase, TUkrainianWordDetails } from "./types";
+import { FullLexem } from "./types";
+import {
+  TUkrainianCase,
+  TUkrainianGender,
+  TUkrainianWordDetails,
+} from "./ukrainian-types";
 
 const UKRAINIAN_DICTINARY_COLUMNS = [
   "text",
@@ -34,6 +39,26 @@ function guessUkrainianNounNumber(
   if (text.endsWith("их")) return "plural";
   return "singular";
 }
+function guessUkrainianAdjectiveEntry(
+  details: TUkrainianWordDetails & { type: "adjective" },
+  text: string
+): TUkrainianWordDetails {
+  let cs: TUkrainianCase = "nominative";
+  let gender: TUkrainianGender = "masculine";
+  if (/(а|ею|ої|у|ою|ій)$/.test(text)) {
+    gender = "feminine";
+  }
+
+  const number = /(і|их|ими)$/.test(text) ? "plural" : "singular";
+  return {
+    type: "adjective",
+    base: details.base,
+    case: cs,
+    gender: details.gender,
+    number,
+    text,
+  };
+}
 function guessUkrainianNounEntry(
   details: TUkrainianWordDetails & { type: "noun" },
   text: string
@@ -56,6 +81,26 @@ export function guessDictionaryEntry<
     if (similarEntry.details.type === "noun") {
       const guessEntry = guessUkrainianNounEntry(similarEntry.details, text);
       assert(guessEntry.type === "noun", "Expected noun here");
+      return csvify(
+        {
+          text: guessEntry.text,
+          base: guessEntry.base,
+          type: guessEntry.type,
+          case: guessEntry.case,
+          number: guessEntry.number,
+          gender: guessEntry.gender,
+        },
+        {
+          columns: UKRAINIAN_DICTINARY_COLUMNS,
+        }
+      );
+    }
+    if (similarEntry.details.type === "adjective") {
+      const guessEntry = guessUkrainianAdjectiveEntry(
+        similarEntry.details,
+        text
+      );
+      assert(guessEntry.type === "adjective", "Expected noun here");
       return csvify(
         {
           text: guessEntry.text,
@@ -110,6 +155,28 @@ export function guessDictionaryEntry<
       );
     }
     if (similarEntry.details.type === "verb") {
+      return csvify(
+        {
+          ...similarEntry.details,
+          text,
+        },
+        {
+          columns: UKRAINIAN_DICTINARY_COLUMNS,
+        }
+      );
+    }
+    if (similarEntry.details.type === "preposition") {
+      return csvify(
+        {
+          ...similarEntry.details,
+          text,
+        },
+        {
+          columns: UKRAINIAN_DICTINARY_COLUMNS,
+        }
+      );
+    }
+    if (similarEntry.details.type === "adverb") {
       return csvify(
         {
           ...similarEntry.details,

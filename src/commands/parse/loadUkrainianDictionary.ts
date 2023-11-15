@@ -1,15 +1,14 @@
 import { readableStreamToText } from "bun";
 import { Lexem } from "../../lexer/Lexem";
+import { FullLexem, IDictionary } from "./types";
 import {
-  FullLexem,
-  IDictionary,
   TUkrainianWordDetails,
   UKRAINIAN_CASES,
   UKRAINIAN_GENDERS,
   UKRAINIAN_NUMBERS,
   UKRAINIAN_PERSONS,
   UKRAINIAN_VOICES,
-} from "./types";
+} from "./ukrainian-types";
 import { parse } from "csv";
 import { resolve } from "path";
 import assert from "assert";
@@ -93,6 +92,24 @@ function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
       text: v.text,
     };
   }
+  if (v.type === "preposition") {
+    assert(typeof v.base === "string");
+    assert(typeof v.text === "string");
+    return {
+      type: "preposition",
+      base: v.base,
+      text: v.text,
+    };
+  }
+  if (v.type === "adverb") {
+    assert(typeof v.base === "string");
+    assert(typeof v.text === "string");
+    return {
+      type: "adverb",
+      base: v.base,
+      text: v.text,
+    };
+  }
   if (v.type === "verb") {
     assert(typeof v.base === "string");
     assert(typeof v.text === "string");
@@ -119,27 +136,27 @@ export async function loadUkrainianDictionary(): Promise<IDictionary<Lexem>> {
   const uaPath = resolve(import.meta.dir, "ua.csv");
   const csvFile = Bun.file(uaPath);
   const content = await readableStreamToText(csvFile.stream());
-  const dictionary: Map<string, FullLexem<Lexem>> = new Map();
+  const dictionary: Map<string, FullLexem<Lexem>[]> = new Map();
   for await (const record of parse(content, {
     columns: true,
   })) {
     const details = parseDetails(record);
-    dictionary.set(record.text, {
+    const prevList = dictionary.get(record.text) ?? [];
+    prevList.push({
       type: "ukrainian-word",
       details: details,
     });
+    dictionary.set(record.text, prevList);
   }
   return {
     get(word: string) {
-      if (!dictionary.has(word)) {
-        return null;
-      }
-      const entry = dictionary.get(word);
-      return entry!;
+      return dictionary.get(word) || [];
     },
     *values() {
-      for (const entry of dictionary.values()) {
-        yield entry;
+      for (const entries of dictionary.values()) {
+        for (const entry of entries) {
+          yield entry;
+        }
       }
     },
   };

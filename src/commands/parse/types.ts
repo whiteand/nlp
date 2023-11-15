@@ -1,83 +1,5 @@
-export const UKRAINIAN_CASES = [
-  "nominative",
-  "accusative",
-  "genitive",
-  "dative",
-  "instrumental",
-  "locative",
-  "vocative",
-] as const;
+import { TUkrainianWordDetails } from "./ukrainian-types";
 
-export const UKRAINIAN_TENSE = [
-  "past",
-  "pluperfect",
-  "present",
-  "future",
-] as const;
-export type TUkrainianTense = (typeof UKRAINIAN_TENSE)[number];
-
-export const UKRAINIAN_VOICES = ["active", "mediopassive"];
-export type TUkrainianVoice = (typeof UKRAINIAN_VOICES)[number];
-export const UKRAINIAN_PERSONS = ["first", "second", "third"] as const;
-export type TUkrainianPerson = (typeof UKRAINIAN_PERSONS)[number];
-export type TUkrainianCase = (typeof UKRAINIAN_CASES)[number];
-
-export const UKRAINIAN_NUMBERS = ["singular", "plural"] as const;
-export type TUkrainianNumber = (typeof UKRAINIAN_NUMBERS)[number];
-export const UKRAINIAN_GENDERS = ["masculine", "feminine", "neuter"] as const;
-export type TUkrainianGender = (typeof UKRAINIAN_GENDERS)[number];
-export type TUkrainianWordDetails =
-  | {
-      type: "noun";
-      text: string;
-      case: TUkrainianCase;
-      base: string;
-      number: TUkrainianNumber;
-      gender: TUkrainianGender;
-    }
-  | {
-      type: "numeral";
-      text: string;
-      case: TUkrainianCase;
-      base: string;
-      number: TUkrainianNumber;
-      gender: TUkrainianGender;
-    }
-  | {
-      type: "adjective";
-      text: string;
-      case: TUkrainianCase;
-      base: string;
-      number: TUkrainianNumber;
-      gender: TUkrainianGender;
-    }
-  | {
-      type: "pronoun";
-      text: string;
-      case: TUkrainianCase;
-      base: string;
-      number: TUkrainianNumber;
-      gender: TUkrainianGender;
-    }
-  | {
-      type: "verb";
-      text: string;
-      base: string;
-      number: TUkrainianNumber;
-      gender: TUkrainianGender;
-      voice: TUkrainianVoice;
-      person: TUkrainianPerson;
-    }
-  | {
-      type: "conjunction";
-      text: string;
-      base: string;
-    }
-  | {
-      type: "particle";
-      text: string;
-      base: string;
-    };
 export interface IUkrainianFullLexem {
   type: "ukrainian-word";
   details: TUkrainianWordDetails;
@@ -93,6 +15,6 @@ export type FullLexem<L extends { type: string; text: string }> =
 export interface ILexer {}
 
 export interface IDictionary<L extends { type: string; text: string }> {
-  get(word: string): FullLexem<L> | null;
+  get(word: string): FullLexem<L>[];
   values(): IterableIterator<FullLexem<L>>;
 }

@@ -15,7 +15,7 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
     this.lexer = lexer;
     this.dictionaries = options.dictionaries;
   }
-  next(): IteratorResult<FullLexem<SourceLexem>, any> {
+  next(): IteratorResult<FullLexem<SourceLexem>[], any> {
     const lexerEntry = this.lexer.next();
     if (lexerEntry.done) {
       return { done: true, value: undefined };
@@ -38,13 +38,11 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
       done: lexerEntry.done,
     };
   }
-  parseUkrainianWord(lexem: SourceLexem): FullLexem<SourceLexem> {
+  parseUkrainianWord(lexem: SourceLexem): FullLexem<SourceLexem>[] {
     const possibleEntries: FullLexem<SourceLexem>[] = [];
     for (const dictionary of this.dictionaries) {
       const entry = dictionary.get(lexem.text);
-      if (entry) {
-        possibleEntries.push(entry);
-      }
+      possibleEntries.push(...entry);
     }
     if (possibleEntries.length === 0) {
       const entries: IUkrainianFullLexem[] = [];
@@ -79,12 +77,8 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
         .join("\n");
 
       throw new Error(errorMessage);
-    } else if (possibleEntries.length === 1) {
-      return possibleEntries[0];
     } else {
-      throw new Error(
-        "There is more than one entry for word: " + JSON.stringify(lexem)
-      );
+      return possibleEntries;
     }
   }
   collect<C extends { push(value: FullLexem<SourceLexem>): void }>(
