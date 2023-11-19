@@ -1,7 +1,10 @@
 import { readableStreamToText } from "bun";
 import { Lexem } from "../../lexer/Lexem";
+import { assert as assertSmart, throwSmart } from "../../assert";
 import { FullLexem, IDictionary } from "./types";
 import {
+  TUkrainianCase,
+  TUkrainianNumber,
   TUkrainianWordDetails,
   UKRAINIAN_CASES,
   UKRAINIAN_GENDERS,
@@ -12,14 +15,39 @@ import {
 import { parse } from "csv";
 import { resolve } from "path";
 import assert from "assert";
+import { chooseSimilar } from "../../chooseSimilar";
+
+function assertSetValue<T extends string>(
+  set: readonly T[],
+  setName: string,
+  value: any
+): asserts value is T {
+  if (set.includes(value)) return;
+  throwSmart((tb) =>
+    tb
+      .write(`Unknown ${setName}: `)
+      .writeColored("red", JSON.stringify(value))
+      .newline()
+      .write("Maybe you meant: ")
+      .writeColored("green", chooseSimilar(value, set))
+  );
+}
+
+function assertNumber(value: any): asserts value is TUkrainianNumber {
+  assertSetValue(UKRAINIAN_NUMBERS, "number", value);
+}
+
+function assertCase(value: any): asserts value is TUkrainianCase {
+  assertSetValue(UKRAINIAN_CASES, "case", value);
+}
 
 function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
   if (v.type === "noun") {
     assert(typeof v.base === "string");
     assert(typeof v.text === "string");
-    assert(UKRAINIAN_CASES.includes(v.case), "Unknown case: " + v.case);
+    assertCase(v.case);
     assert(UKRAINIAN_GENDERS.includes(v.gender), "Unknown gender: " + v.gender);
-    assert(UKRAINIAN_NUMBERS.includes(v.number), "Unknown number: " + v.number);
+    assertNumber(v.number);
     return {
       type: "noun",
       base: v.base,
@@ -41,9 +69,9 @@ function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
   if (v.type === "pronoun") {
     assert(typeof v.base === "string");
     assert(typeof v.text === "string");
-    assert(UKRAINIAN_CASES.includes(v.case), "Unknown case: " + v.case);
+    assertCase(v.case);
     assert(UKRAINIAN_GENDERS.includes(v.gender), "Unknown gender: " + v.gender);
-    assert(UKRAINIAN_NUMBERS.includes(v.number), "Unknown number: " + v.number);
+    assertNumber(v.number);
     return {
       type: "pronoun",
       base: v.base,
@@ -56,9 +84,9 @@ function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
   if (v.type === "adjective") {
     assert(typeof v.base === "string");
     assert(typeof v.text === "string");
-    assert(UKRAINIAN_CASES.includes(v.case), "Unknown case: " + v.case);
+    assertCase(v.case);
     assert(UKRAINIAN_GENDERS.includes(v.gender), "Unknown gender: " + v.gender);
-    assert(UKRAINIAN_NUMBERS.includes(v.number), "Unknown number: " + v.number);
+    assertNumber(v.number);
     return {
       type: "adjective",
       base: v.base,
@@ -71,9 +99,9 @@ function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
   if (v.type === "numeral") {
     assert(typeof v.base === "string");
     assert(typeof v.text === "string");
-    assert(UKRAINIAN_CASES.includes(v.case), "Unknown case: " + v.case);
+    assertCase(v.case);
     assert(UKRAINIAN_GENDERS.includes(v.gender), "Unknown gender: " + v.gender);
-    assert(UKRAINIAN_NUMBERS.includes(v.number), "Unknown number: " + v.number);
+    assertNumber(v.number);
     return {
       type: "numeral",
       base: v.base,
@@ -114,7 +142,7 @@ function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
     assert(typeof v.base === "string");
     assert(typeof v.text === "string");
     assert(UKRAINIAN_GENDERS.includes(v.gender), "Unknown gender: " + v.gender);
-    assert(UKRAINIAN_NUMBERS.includes(v.number), "Unknown number: " + v.number);
+    assertNumber(v.number);
     assert(UKRAINIAN_PERSONS.includes(v.person), "Unknown person: " + v.person);
     assert(UKRAINIAN_VOICES.includes(v.voice), "Unknown voice: " + v.voice);
     return {

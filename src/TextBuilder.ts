@@ -2,6 +2,10 @@ import colors from "colors/safe";
 import { TType, formatType, formatTypeSmart } from "./typescriptTypes";
 import { IFormatter } from "./IFormatter";
 
+interface IToStringer {
+  toString(): string;
+}
+
 interface ISpan {
   fromLineIndex: number;
   fromLineOffset: number;
@@ -182,7 +186,8 @@ export class TextBuilder {
     return this;
   }
 
-  write(s: string): this {
+  write<T extends IToStringer>(object: T): this {
+    const s = object.toString();
     if (!s) return this;
     if (s.indexOf("\n") >= 0) {
       this.pushCurrentAsTab();
@@ -235,15 +240,15 @@ export class TextBuilder {
       toLineOffset,
     };
   }
-  writeColored(color: TColor, text: string): this {
-    const span = this.spanOf((builder) => builder.write(text));
+  writeColored<T extends IToStringer>(color: TColor, text: T): this {
+    const span = this.spanOf((builder) => builder.write(text.toString()));
     this.colored.push({
       span,
       color: color,
     });
     return this;
   }
-  gray(s: string): this {
+  gray<T extends IToStringer>(s: T): this {
     return this.writeColored("gray", s);
   }
   space(): this {

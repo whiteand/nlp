@@ -1,19 +1,25 @@
 import { TextBuilder } from "../../TextBuilder";
 import { chooseSimilar } from "../../chooseSimilar";
+import { IAdvancedLexerStats } from "./IAdvancedLexerStats";
 import { guessDictionaryEntry } from "./guessDictionaryEntry";
 import { FullLexem, IDictionary, IUkrainianFullLexem } from "./types";
 
 export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
-  implements Iterator<FullLexem<SourceLexem>>
+  implements Iterator<FullLexem<SourceLexem>[]>
 {
   private lexer: Iterator<SourceLexem>;
   private dictionaries: IDictionary<SourceLexem>[];
+  private stats: IAdvancedLexerStats;
   constructor(
     lexer: Iterator<SourceLexem>,
-    options: { dictionaries: IDictionary<SourceLexem>[] }
+    options: {
+      dictionaries: IDictionary<SourceLexem>[];
+      stats: IAdvancedLexerStats;
+    }
   ) {
     this.lexer = lexer;
     this.dictionaries = options.dictionaries;
+    this.stats = options.stats;
   }
   next(): IteratorResult<FullLexem<SourceLexem>[], any> {
     const lexerEntry = this.lexer.next();
@@ -22,8 +28,10 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
     }
 
     const lexem = lexerEntry.value;
+    this.stats.onLexem(lexem.text);
     if (lexem.type === "ukrainian-word") {
       const fullLexem = this.parseUkrainianWord(lexem);
+      this.stats.onUkrainianLexem();
       return {
         value: fullLexem,
         done: lexerEntry.done,
@@ -31,10 +39,12 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
     }
 
     return {
-      value: {
-        type: "rest",
-        lexem,
-      },
+      value: [
+        {
+          type: "rest",
+          lexem,
+        },
+      ],
       done: lexerEntry.done,
     };
   }
@@ -73,6 +83,9 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
         .write(guessDictionaryEntry(similarEntry, lexem.text))
         .newline()
         .newline()
+        .write("Current stats: ")
+        .newline(2)
+        .with((tb) => this.stats.display(tb))
         .build()
         .join("\n");
 
@@ -81,7 +94,7 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
       return possibleEntries;
     }
   }
-  collect<C extends { push(value: FullLexem<SourceLexem>): void }>(
+  collect<C extends { push(value: FullLexem<SourceLexem>[]): void }>(
     collection: C
   ): C {
     while (true) {

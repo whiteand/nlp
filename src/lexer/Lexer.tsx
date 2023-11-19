@@ -985,7 +985,7 @@ export class Lexer implements Iterator<Lexem>, Iterable<Lexem> {
         (this.charIter.matchesAt(1, UKRAINIAN_LETTERS) ||
           this.charIter.matchesAt(1, DIGITS))
       ) {
-        res += "’";
+        res += char;
         this.charIter.skip(char.length);
         continue;
       }

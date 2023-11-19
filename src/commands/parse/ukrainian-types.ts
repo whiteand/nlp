@@ -9,6 +9,7 @@ export const UKRAINIAN_CASES = [
 ] as const;
 
 export const UKRAINIAN_TENSE = [
+  "infinitive",
   "past",
   "pluperfect",
   "present",

@@ -5,6 +5,7 @@ import { CharIter } from "../../CharIter";
 import { Lexer } from "../../lexer/Lexer";
 import { AdvancedLexer } from "./AdvancedLexer";
 import { loadUkrainianDictionary } from "./loadUkrainianDictionary";
+import { LexerStats } from "./LexerStats";
 
 export const PARSE_COMMAND: ICommand = {
   help() {
@@ -27,8 +28,10 @@ export const PARSE_COMMAND: ICommand = {
     const text = await readableStreamToText(Bun.stdin.stream());
     const charIter = new CharIter(text);
     const lexer = new Lexer(charIter);
+    const stats = new LexerStats();
     const advancedLexer = new AdvancedLexer(lexer, {
       dictionaries: [await loadUkrainianDictionary()],
+      stats,
     });
     const lexems = advancedLexer.collect([]);
   },
