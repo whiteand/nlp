@@ -144,7 +144,7 @@ function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
     assert(UKRAINIAN_GENDERS.includes(v.gender), "Unknown gender: " + v.gender);
     assertNumber(v.number);
     assert(UKRAINIAN_PERSONS.includes(v.person), "Unknown person: " + v.person);
-    assert(UKRAINIAN_VOICES.includes(v.voice), "Unknown voice: " + v.voice);
+    assertSetValue(UKRAINIAN_VOICES, "voice", v.voice);
     return {
       type: "verb",
       base: v.base,
