@@ -12,9 +12,8 @@ export type FullLexem<L extends { type: string; text: string }> =
   | IUkrainianFullLexem
   | IRestLexems<L>;
 
-export interface ILexer {}
-
 export interface IDictionary<L extends { type: string; text: string }> {
   get(word: string): FullLexem<L>[];
+  add(word: string, lexems: FullLexem<L>[]): this;
   values(): IterableIterator<FullLexem<L>>;
 }

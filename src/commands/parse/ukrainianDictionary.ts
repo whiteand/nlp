@@ -1,7 +1,7 @@
 import { readableStreamToText } from "bun";
 import { Lexem } from "../../lexer/Lexem";
-import { assert as assertSmart, throwSmart } from "../../assert";
-import { FullLexem, IDictionary } from "./types";
+import { throwSmart } from "../../assert";
+import { FullLexem, IDictionary, IUkrainianFullLexem } from "./types";
 import {
   TUkrainianCase,
   TUkrainianNumber,
@@ -12,10 +12,12 @@ import {
   UKRAINIAN_PERSONS,
   UKRAINIAN_VOICES,
 } from "./ukrainian-types";
-import { parse } from "csv";
+import { parse, stringify } from "csv";
 import { resolve } from "path";
 import assert from "assert";
 import { chooseSimilar } from "../../chooseSimilar";
+import { isEqualFullLexem } from "./isEqualFullLexem";
+import { UKRAINIAN_DICTINARY_COLUMNS } from "./UKRAINIAN_DICTINARY_COLUMNS";
 
 function assertSetValue<T extends string>(
   set: readonly T[],
@@ -160,32 +162,86 @@ function parseDetails(v: Record<string, any>): TUkrainianWordDetails {
   );
 }
 
+export class UkrainianDictionary implements IDictionary<Lexem> {
+  private readonly dictionary: Map<string, FullLexem<Lexem>[]> = new Map();
+  constructor() {
+    this.dictionary = new Map();
+  }
+  add(word: string, lexems: FullLexem<Lexem>[]) {
+    const prevList = this.dictionary.get(word) ?? [];
+    nextLexem: for (const lexem of lexems) {
+      for (const oldLexem of prevList) {
+        if (isEqualFullLexem(oldLexem, lexem)) continue nextLexem;
+      }
+      prevList.push(lexem);
+    }
+    this.dictionary.set(word, prevList);
+    return this;
+  }
+  get(word: string) {
+    return this.dictionary.get(word) || [];
+  }
+  *values() {
+    for (const entries of this.dictionary.values()) {
+      for (const entry of entries) {
+        yield entry;
+      }
+    }
+  }
+}
+
+export const UK_DICTIONARY_PATH = resolve(import.meta.dir, "ua.csv");
+
+export async function writeUkrainianDictionary(
+  dict: IDictionary<Lexem>,
+  filePath: string
+): Promise<void> {
+  const ukrainianDictionary = new UkrainianDictionary();
+  const ukrainianLexems: IUkrainianFullLexem[] = [];
+  for (const entry of dict.values()) {
+    if (entry.type === "rest") continue;
+    ukrainianLexems.push(entry);
+    ukrainianDictionary.add(entry.details.text, [entry]);
+  }
+  ukrainianLexems.sort((a, b) => {
+    if (a.details.base > b.details.base) return 1;
+    if (a.details.base < b.details.base) return -1;
+    return 0;
+  });
+
+  const data = await new Promise<string>((resolve, reject) => {
+    stringify(
+      ukrainianLexems.map((v) => v.details),
+      {
+        columns: UKRAINIAN_DICTINARY_COLUMNS,
+        header: true,
+        objectMode: true,
+      },
+      (err, data) => {
+        if (err) return reject(err);
+        resolve(data);
+      }
+    );
+  });
+  const file = Bun.file(filePath);
+  Bun.write(file, data);
+}
+
 export async function loadUkrainianDictionary(): Promise<IDictionary<Lexem>> {
-  const uaPath = resolve(import.meta.dir, "ua.csv");
-  const csvFile = Bun.file(uaPath);
+  const csvFile = Bun.file(UK_DICTIONARY_PATH);
   const content = await readableStreamToText(csvFile.stream());
-  const dictionary: Map<string, FullLexem<Lexem>[]> = new Map();
+  const res = new UkrainianDictionary();
+
   for await (const record of parse(content, {
     columns: true,
   })) {
     const details = parseDetails(record);
-    const prevList = dictionary.get(record.text) ?? [];
-    prevList.push({
-      type: "ukrainian-word",
-      details: details,
-    });
-    dictionary.set(record.text, prevList);
+    res.add(record.text, [
+      {
+        type: "ukrainian-word",
+        details: details,
+      },
+    ]);
   }
-  return {
-    get(word: string) {
-      return dictionary.get(word) || [];
-    },
-    *values() {
-      for (const entries of dictionary.values()) {
-        for (const entry of entries) {
-          yield entry;
-        }
-      }
-    },
-  };
+  return res;
 }

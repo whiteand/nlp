@@ -4,8 +4,19 @@ import { IAdvancedLexerStats } from "./IAdvancedLexerStats";
 import { guessDictionaryEntry } from "./guessDictionaryEntry";
 import { FullLexem, IDictionary, IUkrainianFullLexem } from "./types";
 
+type TAdvancedLexerResult<SourceLexem extends { type: string; text: string }> =
+  | {
+      type: "ok";
+      lexems: FullLexem<SourceLexem>[];
+    }
+  | {
+      type: "unknown-ukranian-word";
+      lexem: SourceLexem;
+      message: string;
+    };
+
 export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
-  implements Iterator<FullLexem<SourceLexem>[]>
+  implements Iterator<TAdvancedLexerResult<SourceLexem>>
 {
   private lexer: Iterator<SourceLexem>;
   private dictionaries: IDictionary<SourceLexem>[];
@@ -21,7 +32,8 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
     this.dictionaries = options.dictionaries;
     this.stats = options.stats;
   }
-  next(): IteratorResult<FullLexem<SourceLexem>[], any> {
+
+  next(): IteratorResult<TAdvancedLexerResult<SourceLexem>, any> {
     const lexerEntry = this.lexer.next();
     if (lexerEntry.done) {
       return { done: true, value: undefined };
@@ -30,25 +42,33 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
     const lexem = lexerEntry.value;
     this.stats.onLexem(lexem.text);
     if (lexem.type === "ukrainian-word") {
-      const fullLexem = this.parseUkrainianWord(lexem);
-      this.stats.onUkrainianLexem();
+      const res = this.parseUkrainianWord(lexem);
+
+      if (res.type === "ok") {
+        this.stats.onUkrainianLexem();
+      }
+
       return {
-        value: fullLexem,
+        value: res,
         done: lexerEntry.done,
       };
     }
 
-    return {
-      value: [
+    const restResult: TAdvancedLexerResult<SourceLexem> = {
+      type: "ok",
+      lexems: [
         {
           type: "rest",
           lexem,
         },
       ],
+    };
+    return {
+      value: restResult,
       done: lexerEntry.done,
     };
   }
-  parseUkrainianWord(lexem: SourceLexem): FullLexem<SourceLexem>[] {
+  parseUkrainianWord(lexem: SourceLexem): TAdvancedLexerResult<SourceLexem> {
     const possibleEntries: FullLexem<SourceLexem>[] = [];
     for (const dictionary of this.dictionaries) {
       const entry = dictionary.get(lexem.text);
@@ -89,12 +109,19 @@ export class AdvancedLexer<SourceLexem extends { type: string; text: string }>
         .build()
         .join("\n");
 
-      throw new Error(errorMessage);
+      return {
+        type: "unknown-ukranian-word",
+        lexem,
+        message: errorMessage,
+      };
     } else {
-      return possibleEntries;
+      return {
+        type: "ok",
+        lexems: possibleEntries,
+      };
     }
   }
-  collect<C extends { push(value: FullLexem<SourceLexem>[]): void }>(
+  collect<C extends { push(value: TAdvancedLexerResult<SourceLexem>): void }>(
     collection: C
   ): C {
     while (true) {

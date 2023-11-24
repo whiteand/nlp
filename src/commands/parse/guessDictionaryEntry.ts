@@ -6,22 +6,9 @@ import {
   TUkrainianGender,
   TUkrainianWordDetails,
 } from "./ukrainian-types";
+import { UKRAINIAN_DICTINARY_COLUMNS } from "./UKRAINIAN_DICTINARY_COLUMNS";
 
-const UKRAINIAN_DICTINARY_COLUMNS = [
-  "text",
-  "base",
-  "type",
-  "case",
-  "number",
-  "gender",
-  "tense",
-  "voice",
-  "person",
-];
-function guessUkrainianNounCase(
-  details: TUkrainianWordDetails,
-  text: string
-): TUkrainianCase {
+function guessUkrainianNounCase(text: string): TUkrainianCase {
   if (text.endsWith("ою")) {
     return "instrumental";
   }
@@ -63,7 +50,7 @@ function guessUkrainianNounEntry(
   details: TUkrainianWordDetails & { type: "noun" },
   text: string
 ): TUkrainianWordDetails {
-  const cs = guessUkrainianNounCase(details, text);
+  const cs = guessUkrainianNounCase(text);
   const number = guessUkrainianNounNumber(details, text);
   return {
     type: "noun",

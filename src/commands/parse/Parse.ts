@@ -4,7 +4,7 @@ import { TextBuilder } from "../../TextBuilder";
 import { CharIter } from "../../CharIter";
 import { Lexer } from "../../lexer/Lexer";
 import { AdvancedLexer } from "./AdvancedLexer";
-import { loadUkrainianDictionary } from "./loadUkrainianDictionary";
+import { loadUkrainianDictionary } from "./ukrainianDictionary";
 import { LexerStats } from "./LexerStats";
 
 export const PARSE_COMMAND: ICommand = {
