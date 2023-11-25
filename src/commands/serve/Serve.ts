@@ -1,13 +1,8 @@
 import { readableStreamToText } from "bun";
+import { join } from "path";
 import { ICommand } from "../../App/types";
 import { TextBuilder } from "../../TextBuilder";
-import { CharIter } from "../../CharIter";
-import { Lexer } from "../../lexer/Lexer";
-import { LexerStats } from "../parse/LexerStats";
-import { AdvancedLexer } from "../parse/AdvancedLexer";
 import { loadUkrainianDictionary } from "../parse/ukrainianDictionary";
-import { join } from "path";
-import { exec, execSync } from "child_process";
 
 export const SERVE_COMMAND: ICommand = {
   name: "serve",
@@ -27,23 +22,6 @@ export const SERVE_COMMAND: ICommand = {
     };
   },
   async run() {
-    const output = execSync(
-      "bun tailwindcss -i " +
-        join(import.meta.dir, "app/src/main.scss") +
-        " -o " +
-        join(import.meta.dir, "app/public/dist/main.css"),
-      {
-        cwd: join(import.meta.dir, "app"),
-      }
-    );
-    console.log(output.toString());
-
-    await Bun.build({
-      entrypoints: [join(import.meta.dir, "app/src/index.tsx")],
-      outdir: join(import.meta.dir, "app/public/dist"),
-      target: "browser",
-      format: "esm",
-    });
     const text = await readableStreamToText(Bun.stdin.stream());
     let uaDictionary = await loadUkrainianDictionary();
 

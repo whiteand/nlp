@@ -14,6 +14,7 @@
   "author": "andrewbeletskiy",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/react-router": "beta",
     "@types/react": "^18.2.38",
     "@types/react-dom": "^18.2.17",
     "react": "^18.2.0",

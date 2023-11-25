@@ -9,7 +9,8 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "dev": "bun src/index.ts telegram-print data/zelensky.json | bun run --watch src/index.ts serve"
+    "dev-be": "bun src/index.ts telegram-print data/zelensky.json | bun run --watch src/index.ts serve",
+    "dev-ui": "bun run --watch src/commands/serve/app/build.ts"
   },
   "dependencies": {
     "@js-temporal/polyfill": "^0.4.4",
