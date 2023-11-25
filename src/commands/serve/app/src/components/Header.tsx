@@ -17,11 +17,11 @@ function Header({ className }: { className?: string }) {
   return (
     <header
       className={clsx(
-        "bg-sky-900/10 flex justify-center items-center py-4 md:py-2",
+        "bg-sky-900/10 flex justify-center items-center py-4 md:py-2 px-3",
         className
       )}
     >
-      <div className="container mx-auto px-3 md:px-0 flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-8 justify-start">
+      <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-8 justify-start">
         <div className="flex items-center gap-2 rounded-full bg-white pl-1 pr-4 py-1">
           <Logo className="text-white relative" width="28" height="28" />
           <div className="text-sky-900 uppercase text-base">Зрозуміло</div>
