@@ -6,9 +6,9 @@ function Footer() {
     <footer className="bg-sky-900/10 flex justify-center">
       <div className="container mx-auto flex gap-4 justify-between">
         <time {...timeProps}>Зроблено у 2023</time>
-        <a href="https://github.com/whiteand/nlp">
-          Github: <span className="font-bold">@whiteand</span>
-        </a>
+        <div>
+          Github: <a href="https://github.com/whiteand/nlp">@whiteand</a>
+        </div>
       </div>
     </footer>
   );
