@@ -21,7 +21,7 @@ h3 {
   @apply text-xl;
 }
 p {
-  @apply max-w-[70em];
+  @apply max-w-[30em];
 }
 h1,
 h2,
@@ -32,4 +32,11 @@ h3 {
 }
 p + p {
   @apply mt-2;
+}
+
+a {
+  @apply font-bold;
+  &:hover {
+    @apply text-sky-900;
+  }
 }

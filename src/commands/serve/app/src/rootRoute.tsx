@@ -10,7 +10,7 @@ function Root() {
   return (
     <>
       <Header />
-      <main className="mt-4 min-h-[calc(100vh_-_76px)]">
+      <main className="mt-4 min-h-[calc(100vh_-_92px)]">
         <Outlet />
       </main>
       <Footer />

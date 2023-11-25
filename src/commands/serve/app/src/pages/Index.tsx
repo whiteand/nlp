@@ -11,7 +11,7 @@ function Index() {
   return (
     <div className="container mx-auto">
       <h1 className="flex items-center gap-4">
-        <Logo width="48" height="48" />
+        <Logo width="40" height="40" />
         Зрозуміло
       </h1>
       <p>

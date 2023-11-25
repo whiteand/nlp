@@ -15,7 +15,7 @@ function Contacts() {
         Звертайтесь до мене через Github:{" "}
         <a
           href="https://github.com/whiteand/nlp"
-          className="text-bold test-sky-900 inline-block font-bold"
+          className="text-bold test-sky-900 inline-block font-bold font-mono"
         >
           @whiteand
         </a>
