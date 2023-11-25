@@ -1,5 +1,6 @@
 import { Outlet, RootRoute } from "@tanstack/react-router";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 // Create a root route
 export const rootRoute = new RootRoute({
@@ -9,7 +10,10 @@ function Root() {
   return (
     <>
       <Header />
-      <Outlet />
+      <main className="mt-4 min-h-[calc(100vh_-_76px)]">
+        <Outlet />
+      </main>
+      <Footer />
     </>
   );
 }

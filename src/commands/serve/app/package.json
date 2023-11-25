@@ -17,8 +17,10 @@
     "@tanstack/react-router": "beta",
     "@types/react": "^18.2.38",
     "@types/react-dom": "^18.2.17",
+    "clsx": "^2.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.0.0"
   },
   "devDependencies": {
     "tailwindcss": "^3.3.5"

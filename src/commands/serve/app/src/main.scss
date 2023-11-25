@@ -3,5 +3,33 @@
 @tailwind utilities;
 
 body {
-  @apply font-sans;
+  @apply font-sans bg-slate-100;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-normal;
+}
+h1 {
+  @apply text-3xl;
+}
+h2 {
+  @apply text-2xl;
+}
+h3 {
+  @apply text-xl;
+}
+p {
+  @apply max-w-[70em];
+}
+h1,
+h2,
+h3 {
+  & + p {
+    @apply mt-4;
+  }
+}
+p + p {
+  @apply mt-2;
 }

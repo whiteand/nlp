@@ -7,6 +7,14 @@ module.exports = {
         sans: ["Roboto Slab", "sans-serif"],
         mono: ["Roboto Mono", "monospace"],
       },
+      colors: {
+        sky: {
+          900: "#0c4a6e",
+        },
+        amber: {
+          300: "#FBD85E",
+        },
+      },
     },
   },
   plugins: [],

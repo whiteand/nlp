@@ -1,8 +1,8 @@
 import React from "react";
 import { RouterProvider, Router } from "@tanstack/react-router";
 import { rootRoute } from "./rootRoute";
-import { indexRoute } from "./indexRoute";
-import { contactsRoute } from "./contactsRoute";
+import { indexRoute } from "./pages/Index";
+import { contactsRoute } from "./pages/Contacts";
 
 // Create the route tree using your routes
 const routeTree = rootRoute.addChildren([indexRoute, contactsRoute]);
