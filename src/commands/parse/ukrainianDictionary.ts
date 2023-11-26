@@ -181,9 +181,19 @@ export class UkrainianDictionary implements IDictionary<Lexem> {
   get(word: string) {
     return this.dictionary.get(word) || [];
   }
-  *values() {
+  *values(skip: number = 0, take: number = Infinity) {
+    let skipped = 0;
+    let taken = 0;
     for (const entries of this.dictionary.values()) {
       for (const entry of entries) {
+        if (skipped < skip) {
+          skipped++;
+          continue;
+        }
+        if (taken >= take) {
+          break;
+        }
+        taken++;
         yield entry;
       }
     }

@@ -89,3 +89,66 @@ export type TUkrainianWordDetails =
       text: string;
       base: string;
     };
+
+export function getUkrainianWordId(word: TUkrainianWordDetails) {
+  const parts: string[] = [];
+  if (word.type === "noun") {
+    parts.push(
+      "noun",
+      word.gender,
+      word.base,
+      word.case,
+      word.number,
+      word.text
+    );
+  } else if (word.type === "conjunction") {
+    parts.push("conj", word.base);
+  } else if (word.type === "numeral") {
+    parts.push(
+      "numeral",
+      word.gender,
+      word.base,
+      word.case,
+      word.number,
+      word.text
+    );
+  } else if (word.type === "adjective") {
+    parts.push(
+      "adjective",
+      word.gender,
+      word.base,
+      word.case,
+      word.number,
+      word.text
+    );
+  } else if (word.type === "pronoun") {
+    parts.push(
+      "pronoun",
+      word.gender,
+      word.base,
+      word.case,
+      word.number,
+      word.text
+    );
+  } else if (word.type === "verb") {
+    parts.push(
+      "verb",
+      word.voice,
+      word.gender,
+      word.person,
+      word.base,
+      word.number,
+      word.text
+    );
+  } else if (word.type === "adverb") {
+    parts.push("adverb", word.base, word.text);
+  } else if (word.type === "particle") {
+    parts.push("particle", word.base, word.text);
+  } else if (word.type === "preposition") {
+    parts.push("preposition", word.base, word.text);
+  } else {
+    throw new Error("not handled word" + JSON.stringify(word, null, 2));
+  }
+
+  return parts.join("|");
+}
