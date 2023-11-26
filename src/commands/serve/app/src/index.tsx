@@ -1,6 +1,7 @@
 import React from "react";
 import * as ReactDOM from "react-dom/client";
 import App from "./App";
+import { getSocket } from "./packages/be/be";
 
 if (typeof (globalThis as any).document !== "undefined") {
   const element = (globalThis as any).document.getElementById("root");
@@ -8,5 +9,5 @@ if (typeof (globalThis as any).document !== "undefined") {
 
   const root = ReactDOM.createRoot(element);
 
-  root.render(<App />);
+  root.render(<App socket={getSocket()} />);
 }

@@ -8,6 +8,10 @@ const LINKS = [
     text: "Головна",
   },
   {
+    href: "/dictionary",
+    text: "Словник",
+  },
+  {
     href: "/contacts",
     text: "Контакти",
   },
