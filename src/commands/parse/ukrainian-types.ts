@@ -1,8 +1,8 @@
 export const UKRAINIAN_CASES = [
   "nominative",
-  "accusative",
   "genitive",
   "dative",
+  "accusative",
   "instrumental",
   "locative",
   "vocative",
@@ -141,11 +141,11 @@ export function getUkrainianWordId(word: TUkrainianWordDetails) {
       word.text
     );
   } else if (word.type === "adverb") {
-    parts.push("adverb", word.base, word.text);
+    parts.push("adverb", word.text, word.text);
   } else if (word.type === "particle") {
-    parts.push("particle", word.base, word.text);
+    parts.push("particle", word.text, word.text);
   } else if (word.type === "preposition") {
-    parts.push("preposition", word.base, word.text);
+    parts.push("preposition", word.text, word.text);
   } else {
     throw new Error("not handled word" + JSON.stringify(word, null, 2));
   }

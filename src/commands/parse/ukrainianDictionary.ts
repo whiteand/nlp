@@ -18,6 +18,7 @@ import assert from "assert";
 import { chooseSimilar } from "../../chooseSimilar";
 import { isEqualFullLexem } from "./isEqualFullLexem";
 import { UKRAINIAN_DICTINARY_COLUMNS } from "./UKRAINIAN_DICTINARY_COLUMNS";
+import { compareFullLexems } from "./compareFullLexems";
 
 function assertSetValue<T extends string>(
   set: readonly T[],
@@ -182,20 +183,13 @@ export class UkrainianDictionary implements IDictionary<Lexem> {
     return this.dictionary.get(word) || [];
   }
   *values(skip: number = 0, take: number = Infinity) {
-    let skipped = 0;
-    let taken = 0;
-    for (const entries of this.dictionary.values()) {
-      for (const entry of entries) {
-        if (skipped < skip) {
-          skipped++;
-          continue;
-        }
-        if (taken >= take) {
-          break;
-        }
-        taken++;
-        yield entry;
-      }
+    const entries = [...this.dictionary.entries()]
+      .flatMap((entry) => entry[1])
+      .sort(compareFullLexems);
+
+    for (let i = skip, n = Math.min(entries.length, skip + take); i < n; i++) {
+      const entry = entries[i];
+      yield entry;
     }
   }
 }
@@ -213,11 +207,8 @@ export async function writeUkrainianDictionary(
     ukrainianLexems.push(entry);
     ukrainianDictionary.add(entry.details.text, [entry]);
   }
-  ukrainianLexems.sort((a, b) => {
-    if (a.details.base > b.details.base) return 1;
-    if (a.details.base < b.details.base) return -1;
-    return 0;
-  });
+
+  ukrainianLexems.sort(compareFullLexems);
 
   const data = await new Promise<string>((resolve, reject) => {
     stringify(

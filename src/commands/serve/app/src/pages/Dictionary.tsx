@@ -1,8 +1,9 @@
-import { Link, Route, useMatch, useSearch } from "@tanstack/react-router";
-import { firstValueFrom } from "rxjs";
-import { uniqid } from "../packages/be/be";
-import { rootRoute } from "../rootRoute";
+import { Link, Route, useSearch } from "@tanstack/react-router";
 import { Fragment } from "react";
+import { uniqid } from "../packages/be/be";
+import { parseOrDefault } from "../packages/parseOrDefault";
+import { takeUntilAborted } from "../packages/takeUntilAborted";
+import { rootRoute } from "../rootRoute";
 
 let words: Array<{ text: string; base: string; id: string }> = [];
 
@@ -12,23 +13,17 @@ export const dictionaryRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/dictionary",
   validateSearch(rawParams): { skip: number; take: number } {
-    const skipStr = rawParams.skip;
-    const skipNumber =
-      typeof skipStr === "string" ? Number.parseInt(skipStr, 10) : NaN;
-    const skip = Number.isNaN(skipNumber) ? 0 : skipNumber;
-    const takeStr = rawParams.take;
-    const takeNumber =
-      typeof takeStr === "string" ? Number.parseInt(takeStr, 10) : NaN;
-    const take = Number.isNaN(takeNumber) ? DEFAULT_TAKE : takeNumber;
+    const skip = parseOrDefault(rawParams.skip, 0);
+    const take = parseOrDefault(rawParams.take, DEFAULT_TAKE);
 
     return {
       skip,
       take,
     };
   },
-  async load({ search, context: { ws } }) {
+  async load({ search, context: { ws }, abortController }) {
     const id = uniqid();
-    const message$ = ws.multiplex(
+    ws.multiplex(
       () => ({
         type: "get",
         resource: "dictionary",
@@ -41,18 +36,19 @@ export const dictionaryRoute = new Route({
       }),
       (message) =>
         message.type === "dictionary-response" && message.requestId === id
-    );
-    const value = await firstValueFrom(message$);
-    if (value.type === "dictionary-response") {
-      words = value.words;
-    }
+    )
+      .pipe(takeUntilAborted(abortController.signal))
+      .subscribe((value) => {
+        if (value.type === "dictionary-response") {
+          words = value.words;
+        }
+      });
   },
   pendingComponent: () => <div>Завантаження словника...</div>,
   component: Dictionary,
 });
 function Dictionary() {
   const search = useSearch({
-    strict: true,
     from: "/dictionary",
   });
   const skip = "skip" in search ? search.skip : 0;
@@ -60,7 +56,7 @@ function Dictionary() {
   return (
     <article className="container mx-auto pb-4">
       <h1>Словник</h1>
-      <div className="grid grid-cols-2 w-fit">
+      <div className="grid grid-cols-2 w-fit gap-x-4">
         <div>Форма</div>
         <div>База</div>
         {words.map((word) => (
@@ -88,7 +84,7 @@ function Dictionary() {
           <Link
             className="px-2 py-1 flex items-center justify-center bg-sky-900/10 hover:bg-sky-900/20"
             to="/dictionary"
-            search={{ skip: skip + take, take: take }}
+            search={{ skip: skip + take, take }}
           >
             &gt;
           </Link>
